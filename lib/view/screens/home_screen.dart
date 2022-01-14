@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation/generated/l10n.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         child: Center(
-          child: Text("HomeScreen"),
+          child: Text(S.of(context).introTitle1),
         ),
       ),
     );
