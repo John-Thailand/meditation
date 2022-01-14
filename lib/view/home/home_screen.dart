@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meditation/data_models/level.dart';
 import 'package:meditation/data_models/meiso_theme.dart';
 import 'package:meditation/data_models/meiso_time.dart';
+import 'package:meditation/data_models/user_settings.dart';
 import 'package:meditation/generated/l10n.dart';
 import 'package:meditation/view/home/components/decorated_background.dart';
 import 'package:meditation/view/home/components/header_part.dart';
@@ -34,19 +35,32 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         floatingActionButton: SpeedDialPart(),
-        body: Stack(
-          children: [
-            DecoratedBackground(),
-            Column(
-              children: [
-                HeaderPart(),
-                StatusDisplayPart(),
-                PlayButtonsPart(),
-                VolumeSliderPart(),
-              ],
-            ),
-          ],
-        ),
+        body: Selector<MainViewModel, UserSettings?>(
+            selector: (context, viewModel) => viewModel.userSettings,
+            builder: (context, userSettings, child) {
+              return userSettings == null
+                  ? Center(child: CircularProgressIndicator())
+                  : Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        DecoratedBackground(
+                            theme: meisoThemes[userSettings.themeId]),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              HeaderPart(
+                                userSettings: userSettings,
+                              ),
+                              StatusDisplayPart(),
+                              PlayButtonsPart(),
+                              VolumeSliderPart(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+            }),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:meditation/models/managers/ad_manager.dart';
 import 'package:meditation/models/managers/in_app_purchase_manager.dart';
 import 'package:meditation/models/managers/sound_manager.dart';
 import 'package:meditation/models/repositories/shared_prefs_repository.dart';
+import 'package:meditation/utils/constants.dart';
 import 'package:meditation/utils/functions.dart';
 
 class MainViewModel extends ChangeNotifier {
@@ -13,6 +14,8 @@ class MainViewModel extends ChangeNotifier {
   final InAppPurchaseManager inAppPurchaseManager;
 
   UserSettings? userSettings;
+
+  RunningStatus runningStatus = RunningStatus.BEFORE_START;
 
   int remainingTimeSeconds = 0;
   String get remainingTimeString => convertTimeFormat(remainingTimeSeconds);
@@ -35,5 +38,20 @@ class MainViewModel extends ChangeNotifier {
     userSettings = await sharedPrefsRepository.getUserSettings();
     remainingTimeSeconds = userSettings!.timeMinutes * 60;
     notifyListeners();
+  }
+
+  Future<void> setLevel(int index) async {
+    await sharedPrefsRepository.setLevel(index);
+    getUserSettings();
+  }
+
+  Future<void> setTime(int timeMinutes) async {
+    await sharedPrefsRepository.setTime(timeMinutes);
+    getUserSettings();
+  }
+
+  Future<void> setTheme(int index) async {
+    await sharedPrefsRepository.setTheme(index);
+    getUserSettings();
   }
 }
