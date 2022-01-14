@@ -20,6 +20,10 @@ class MainViewModel extends ChangeNotifier {
   int remainingTimeSeconds = 0;
   String get remainingTimeString => convertTimeFormat(remainingTimeSeconds);
 
+  int intervalRemainingSeconds = 0;
+
+  double volume = 0.0;
+
   MainViewModel(
       {required this.sharedPrefsRepository,
       required this.soundManager,
@@ -53,5 +57,18 @@ class MainViewModel extends ChangeNotifier {
   Future<void> setTheme(int index) async {
     await sharedPrefsRepository.setTheme(index);
     getUserSettings();
+  }
+
+  void startMeditation() {}
+
+  void resumeMeditation() {}
+
+  void resetMeditation() {}
+
+  void pauseMeditation() {}
+
+  void changeVolume(double newVolume) {
+    volume = newVolume;
+    notifyListeners();
   }
 }
