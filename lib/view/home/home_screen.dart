@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:meditation/data_models/level.dart';
 import 'package:meditation/data_models/meiso_theme.dart';
 import 'package:meditation/data_models/meiso_time.dart';
 import 'package:meditation/data_models/user_settings.dart';
 import 'package:meditation/generated/l10n.dart';
+import 'package:meditation/models/managers/ad_manager.dart';
 import 'package:meditation/view/home/components/decorated_background.dart';
 import 'package:meditation/view/home/components/header_part.dart';
 import 'package:meditation/view/home/components/play_buttons_part.dart';
@@ -29,7 +31,9 @@ class HomeScreen extends StatelessWidget {
     final viewModel = context.read<MainViewModel>();
 
     Future(() {
-      viewModel.getUserSettings();
+      viewModel
+        ..getUserSettings()
+        ..loadBannerAd();
     });
 
     return SafeArea(
@@ -58,6 +62,27 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+                        Selector<MainViewModel, AdManager>(
+                          selector: (context, viewModel) => viewModel.adManager,
+                          builder: (context, adManager, child) {
+                            final BannerAd? bannerAd = adManager.bannerAd;
+                            return (bannerAd == null)
+                                ? Container(
+                                    width: 0.0,
+                                    height: 0.0,
+                                  )
+                                : Positioned(
+                                    bottom: 8.0,
+                                    left: 20.0,
+                                    right: 20.0,
+                                    child: Container(
+                                      width: bannerAd.size.width.toDouble(),
+                                      height: bannerAd.size.height.toDouble(),
+                                      child: AdWidget(ad: bannerAd),
+                                    ),
+                                  );
+                          },
+                        )
                       ],
                     );
             }),

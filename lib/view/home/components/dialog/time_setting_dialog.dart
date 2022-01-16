@@ -25,7 +25,7 @@ class TimeSettingDialog extends StatelessWidget {
     );
 
     return Container(
-      height: 180.0,
+      height: 180.0 + 60.0,
       child: Column(
         children: [
           SizedBox(

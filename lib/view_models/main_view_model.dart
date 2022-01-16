@@ -36,7 +36,12 @@ class MainViewModel extends ChangeNotifier {
       {required this.sharedPrefsRepository,
       required this.soundManager,
       required this.adManager,
-      required this.inAppPurchaseManager});
+      required this.inAppPurchaseManager}) {
+    adManager
+      ..initAdmob()
+      ..initBannerAd()
+      ..initInterstitialAd();
+  }
 
   Future<void> skipIntro() async {
     await sharedPrefsRepository.skipIntro();
@@ -221,5 +226,14 @@ class MainViewModel extends ChangeNotifier {
   void dispose() {
     super.dispose();
     soundManager.dispose();
+    adManager.dispose();
+  }
+
+  loadBannerAd() {
+    adManager.loadBannerAd();
+  }
+
+  void loadInterstitialAd() {
+    adManager.loadInterstitialAd();
   }
 }
