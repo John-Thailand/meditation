@@ -44,6 +44,7 @@ dependencies:
   flutter_speed_dial: ^5.0.0+1
   just_audio: ^0.9.18
   google_mobile_ads: ^1.0.1
+  purchases_flutter: ^3.9.0
 
 dev_dependencies:
   flutter_test:
