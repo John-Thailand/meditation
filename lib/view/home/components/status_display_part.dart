@@ -78,6 +78,7 @@ class StatusDisplayPart extends StatelessWidget {
 
   void loadInterstitialAd(BuildContext context) {
     final viewModel = context.read<MainViewModel>();
-    viewModel.loadInterstitialAd();
+    final isDeleteAd = viewModel.isDeleteAd;
+    if (!isDeleteAd) viewModel.loadInterstitialAd();
   }
 }

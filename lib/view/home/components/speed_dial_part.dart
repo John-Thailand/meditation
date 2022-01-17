@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:meditation/generated/l10n.dart';
 import 'package:meditation/utils/constants.dart';
@@ -55,11 +58,36 @@ class SpeedDialPart extends StatelessWidget {
           );
   }
 
-  _donate(BuildContext context) {}
+  _donate(BuildContext context) {
+    final viewModel = context.read<MainViewModel>();
+    viewModel.makePurchase(PurchaseMode.DONATE);
+  }
 
-  _deleteAd(BuildContext context) {}
+  _deleteAd(BuildContext context) {
+    final viewModel = context.read<MainViewModel>();
+    if (!viewModel.isDeleteAd) {
+      viewModel.makePurchase(PurchaseMode.DELETE_AD);
+    } else {
+      Fluttertoast.showToast(msg: S.of(context).alreadyPurchased);
+    }
+  }
 
-  _subscribe(BuildContext context) {}
+  _subscribe(BuildContext context) {
+    final viewModel = context.read<MainViewModel>();
+    if (!viewModel.isSubscribed) {
+      viewModel.makePurchase(PurchaseMode.SUBSCRIPTION);
+    } else {
+      Fluttertoast.showToast(msg: S.of(context).alreadyPurchased);
+    }
+  }
 
-  _recoverPurchase(BuildContext context) {}
+  _recoverPurchase(BuildContext context) {
+    if (Platform.isIOS) {
+      final viewModel = context.read<MainViewModel>();
+      viewModel.recoverPurchase();
+      return;
+    }
+    Fluttertoast.showToast(
+        msg: S.of(context).recoverPurchaseNotEnabledInAndroid);
+  }
 }

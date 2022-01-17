@@ -14,6 +14,7 @@ import 'package:meditation/view/home/components/status_display_part.dart';
 import 'package:meditation/view/home/components/volume_slider_part.dart';
 import 'package:meditation/view_models/main_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 List<Level> levels = [];
 List<MeisoTheme> meisoThemes = [];
@@ -28,9 +29,9 @@ class HomeScreen extends StatelessWidget {
     meisoThemes = setMeisoThemes(context);
     meisoTimes = setMeisoTimes(context);
 
-    final viewModel = context.read<MainViewModel>();
-
     Future(() {
+      final viewModel = context.read<MainViewModel>();
+      viewModel.initInAppPurchase();
       viewModel
         ..getUserSettings()
         ..loadBannerAd();
@@ -44,46 +45,60 @@ class HomeScreen extends StatelessWidget {
             builder: (context, userSettings, child) {
               return userSettings == null
                   ? Center(child: CircularProgressIndicator())
-                  : Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        DecoratedBackground(
-                            theme: meisoThemes[userSettings.themeId]),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
+                  : Selector<MainViewModel, bool>(
+                      selector: (context, viewModel) =>
+                          viewModel.isInAppPurchaseProcessing,
+                      builder: (context, isProcessing, child) => Opacity(
+                        opacity: (isProcessing) ? 0.25 : 1.0,
+                        child: AbsorbPointer(
+                          absorbing: isProcessing,
+                          child: Stack(
+                            fit: StackFit.expand,
                             children: [
-                              HeaderPart(
-                                userSettings: userSettings,
+                              DecoratedBackground(
+                                  theme: meisoThemes[userSettings.themeId]),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    HeaderPart(
+                                      userSettings: userSettings,
+                                    ),
+                                    StatusDisplayPart(),
+                                    PlayButtonsPart(),
+                                    VolumeSliderPart(),
+                                  ],
+                                ),
                               ),
-                              StatusDisplayPart(),
-                              PlayButtonsPart(),
-                              VolumeSliderPart(),
+                              Selector<MainViewModel, Tuple2<AdManager, bool>>(
+                                selector: (context, viewModel) => Tuple2(
+                                    viewModel.adManager, viewModel.isDeleteAd),
+                                builder: (context, data, child) {
+                                  final bannerAd = data.item1.bannerAd;
+                                  final isDeleteAd = data.item2;
+                                  return (isDeleteAd || bannerAd == null)
+                                      ? Container(
+                                          width: 0.0,
+                                          height: 0.0,
+                                        )
+                                      : Positioned(
+                                          bottom: 8.0,
+                                          left: 20.0,
+                                          right: 20.0,
+                                          child: Container(
+                                            width:
+                                                bannerAd.size.width.toDouble(),
+                                            height:
+                                                bannerAd.size.height.toDouble(),
+                                            child: AdWidget(ad: bannerAd),
+                                          ),
+                                        );
+                                },
+                              )
                             ],
                           ),
                         ),
-                        Selector<MainViewModel, AdManager>(
-                          selector: (context, viewModel) => viewModel.adManager,
-                          builder: (context, adManager, child) {
-                            final BannerAd? bannerAd = adManager.bannerAd;
-                            return (bannerAd == null)
-                                ? Container(
-                                    width: 0.0,
-                                    height: 0.0,
-                                  )
-                                : Positioned(
-                                    bottom: 8.0,
-                                    left: 20.0,
-                                    right: 20.0,
-                                    child: Container(
-                                      width: bannerAd.size.width.toDouble(),
-                                      height: bannerAd.size.height.toDouble(),
-                                      child: AdWidget(ad: bannerAd),
-                                    ),
-                                  );
-                          },
-                        )
-                      ],
+                      ),
                     );
             }),
       ),

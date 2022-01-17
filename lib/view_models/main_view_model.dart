@@ -32,6 +32,11 @@ class MainViewModel extends ChangeNotifier {
 
   double get volume => soundManager.bellVolume * 100;
 
+  bool get isDeleteAd => inAppPurchaseManager.isDeleteAd;
+  bool get isSubscribed => inAppPurchaseManager.isSubscribed;
+
+  bool isInAppPurchaseProcessing = false;
+
   MainViewModel(
       {required this.sharedPrefsRepository,
       required this.soundManager,
@@ -235,5 +240,35 @@ class MainViewModel extends ChangeNotifier {
 
   void loadInterstitialAd() {
     adManager.loadInterstitialAd();
+  }
+
+  void initInAppPurchase() async {
+    await inAppPurchaseManager.initPlatformState();
+    await getPurchaserInfo();
+  }
+
+  Future<void> getPurchaserInfo() async {
+    await inAppPurchaseManager.getPurchaserInfo();
+  }
+
+  void makePurchase(PurchaseMode purchaseMode) async {
+    isInAppPurchaseProcessing = true;
+    notifyListeners();
+
+    await inAppPurchaseManager.makePurchase(purchaseMode);
+
+    isInAppPurchaseProcessing = false;
+    notifyListeners();
+  }
+
+  void recoverPurchase() async {
+    isInAppPurchaseProcessing = true;
+    notifyListeners();
+
+    await inAppPurchaseManager.recoverPurchase();
+    // await updateAd();
+
+    isInAppPurchaseProcessing = false;
+    notifyListeners();
   }
 }
